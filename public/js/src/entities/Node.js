@@ -13,16 +13,13 @@ export default class Node {
 		this.position = new Vector2D(x, y);
 
 		// velocity
-		this.velocity = new Vector2D(7, 0);
+		this.velocity = new Vector2D(0, 0);
 
 		// acceleration
 		this.acceleration = new Vector2D(0, 0);
 
 		// direction
 		this.direction = this.velocity.normalize();
-
-		this.target = new Vector2D(300, 300);
-		this.targetRadius = 10;
 
 		this.radius = radius;
 		this.color = color;
@@ -32,10 +29,21 @@ export default class Node {
 	// update
 	update() {
 		// update velocity
-		this.velocity = this.velocity.add(this.acceleration).multiply(0.99);
+		this.velocity = this.velocity.add(this.acceleration).multiply(0.98);
+
+		// if velocity is less than 0.1, set to 0
+		if (this.velocity.magnitude() < 0.01) {
+			this.velocity = new Vector2D(0, 0);
+		}
 
 		// update position
 		this.position = this.position.add(this.velocity);
+
+		// update direction
+		this.direction = this.velocity.normalize();
+
+		// reset acceleration
+		this.acceleration = new Vector2D(0, 0);
 	}
 
 	// draw
@@ -101,18 +109,6 @@ export default class Node {
 			this.engine.camera.getOffsetX(this.position.x),
 			this.engine.camera.getOffsetY(this.position.y + this.radius + 80)
 		);
-
-		// draw target in green
-		context.beginPath();
-		context.arc(
-			this.engine.camera.getOffsetX(this.target.x),
-			this.engine.camera.getOffsetY(this.target.y),
-			this.targetRadius,
-			0,
-			2 * Math.PI
-		);
-		context.fillStyle = "green";
-		context.fill();
 
 		// draw direction to target in green and length of 100
 		context.beginPath();

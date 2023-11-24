@@ -66,7 +66,7 @@ export default class Engine {
 		this.gameLoop(this);
 
 		// output camera position to console
-		console.log(this.camera.position);
+		//console.log(this.camera.position);
 
 		// calculate the fps and display it if showFPS is true
 		this.calculateFPS();
