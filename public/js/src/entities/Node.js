@@ -5,7 +5,10 @@ import Vector2D from "../physics/Vector2D.js";
 
 export default class Node {
 	// constructor
-	constructor(x, y, radius, color, debug = false) {
+	constructor(engine, x, y, radius, color, debug = false) {
+		// set engine
+		this.engine = engine;
+
 		// position
 		this.position = new Vector2D(x, y);
 
@@ -29,7 +32,7 @@ export default class Node {
 	// update
 	update() {
 		// update velocity
-		this.velocity = this.velocity.add(this.acceleration);
+		this.velocity = this.velocity.add(this.acceleration).multiply(0.99);
 
 		// update position
 		this.position = this.position.add(this.velocity);
@@ -38,7 +41,13 @@ export default class Node {
 	// draw
 	draw(context) {
 		context.beginPath();
-		context.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI);
+		context.arc(
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y),
+			this.radius,
+			0,
+			2 * Math.PI
+		);
 		context.fillStyle = this.color;
 		context.fill();
 		context.closePath();
@@ -62,8 +71,8 @@ export default class Node {
 				this.position.x.toFixed(2) +
 				", " +
 				this.position.y.toFixed(2),
-			this.position.x,
-			this.position.y + this.radius + 20
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y + this.radius + 20)
 		);
 
 		context.fillText(
@@ -71,8 +80,8 @@ export default class Node {
 				this.velocity.x.toFixed(2) +
 				", " +
 				this.velocity.y.toFixed(2),
-			this.position.x,
-			this.position.y + this.radius + 40
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y + this.radius + 40)
 		);
 
 		context.fillText(
@@ -80,8 +89,8 @@ export default class Node {
 				this.acceleration.x.toFixed(2) +
 				", " +
 				this.acceleration.y.toFixed(2),
-			this.position.x,
-			this.position.y + this.radius + 60
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y + this.radius + 60)
 		);
 
 		context.fillText(
@@ -89,15 +98,15 @@ export default class Node {
 				this.direction.x.toFixed(2) +
 				", " +
 				this.direction.y.toFixed(2),
-			this.position.x,
-			this.position.y + this.radius + 80
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y + this.radius + 80)
 		);
 
 		// draw target in green
 		context.beginPath();
 		context.arc(
-			this.target.x,
-			this.target.y,
+			this.engine.camera.getOffsetX(this.target.x),
+			this.engine.camera.getOffsetY(this.target.y),
 			this.targetRadius,
 			0,
 			2 * Math.PI
@@ -107,10 +116,13 @@ export default class Node {
 
 		// draw direction to target in green and length of 100
 		context.beginPath();
-		context.moveTo(this.position.x, this.position.y);
+		context.moveTo(
+			this.engine.camera.getOffsetX(this.position.x),
+			this.engine.camera.getOffsetY(this.position.y)
+		);
 		context.lineTo(
-			this.position.x + this.direction.x * 100,
-			this.position.y + this.direction.y * 100
+			this.engine.camera.getOffsetX(this.position.x + this.direction.x * 100),
+			this.engine.camera.getOffsetY(this.position.y + this.direction.y * 100)
 		);
 		context.strokeStyle = "green";
 		context.stroke();
