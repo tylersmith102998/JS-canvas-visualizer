@@ -1,5 +1,6 @@
 // import engine
 import Engine from "./src/Engine.js";
+import Camera from "./src/Camera.js";
 
 import Node from "./src/entities/Node.js";
 import Vector2D from "./src/physics/Vector2D.js";

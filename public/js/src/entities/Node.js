@@ -10,7 +10,7 @@ export default class Node {
 		this.position = new Vector2D(x, y);
 
 		// velocity
-		this.velocity = new Vector2D(0, 0);
+		this.velocity = new Vector2D(7, 0);
 
 		// acceleration
 		this.acceleration = new Vector2D(0, 0);
@@ -18,7 +18,7 @@ export default class Node {
 		// direction
 		this.direction = this.velocity.normalize();
 
-		this.target = new Vector2D(1000, 500);
+		this.target = new Vector2D(300, 300);
 		this.targetRadius = 10;
 
 		this.radius = radius;
@@ -28,61 +28,11 @@ export default class Node {
 
 	// update
 	update() {
-		// reset acceleration
-		this.acceleration = this.acceleration.multiply(0);
+		// update velocity
+		this.velocity = this.velocity.add(this.acceleration);
 
-		// simulate gravity around the target
-		const G = 0.1;
-
-		// Calculate distance between objects
-		const displacement = this.target.subtract(this.position);
-		const distance = displacement.magnitude();
-
-		const forceMagnitude = (G * 100000 * 100000) / distance ** 2;
-		var force = displacement.normalize().multiply(forceMagnitude);
-
-		// divide force by mass
-		force = force.divide(100000);
-		console.log(force);
-
-		if (!this.checkCollision(this.target)) {
-			// add force to acceleration
-			this.acceleration = this.acceleration.add(force);
-
-			// update velocity
-			this.velocity = this.velocity.add(this.acceleration);
-
-			// update position
-			this.position = this.position.add(this.velocity);
-
-			// update direction
-			this.direction = this.velocity.normalize();
-		} else {
-			var normal = displacement.normalize();
-			var relativeVelocity = new Vector2D(0, 0).subtract(this.velocity);
-
-			// calculate impulse
-			var impulse = (2 * relativeVelocity.dot(normal)) / (100000 + 100000);
-
-			this.velocity = this.velocity.add(normal.multiply(impulse * 100000));
-
-			// dampening
-			this.velocity = this.velocity.multiply(0.5);
-
-			// prevent overlap
-			var overlap = this.radius + this.targetRadius - normal.magnitude();
-			var separation = normal.multiply(overlap / 2);
-
-			this.position = this.position.subtract(separation);
-
-			// update direction
-			this.direction = this.velocity.normalize();
-		}
-	}
-
-	// check collision with another node
-	checkCollision(node) {
-		return this.position.distanceTo(node) < this.radius + this.targetRadius;
+		// update position
+		this.position = this.position.add(this.velocity);
 	}
 
 	// draw
@@ -104,7 +54,7 @@ export default class Node {
 	drawDebug(context) {
 		context.font = "12px Arial";
 		context.fillStyle = "white";
-		context.textAlign = "right";
+		context.textAlign = "justify";
 		const canvasWidth = context.canvas.width;
 
 		context.fillText(
@@ -112,8 +62,8 @@ export default class Node {
 				this.position.x.toFixed(2) +
 				", " +
 				this.position.y.toFixed(2),
-			canvasWidth - 10,
-			20
+			this.position.x,
+			this.position.y + this.radius + 20
 		);
 
 		context.fillText(
@@ -121,8 +71,8 @@ export default class Node {
 				this.velocity.x.toFixed(2) +
 				", " +
 				this.velocity.y.toFixed(2),
-			canvasWidth - 10,
-			40
+			this.position.x,
+			this.position.y + this.radius + 40
 		);
 
 		context.fillText(
@@ -130,8 +80,8 @@ export default class Node {
 				this.acceleration.x.toFixed(2) +
 				", " +
 				this.acceleration.y.toFixed(2),
-			canvasWidth - 10,
-			60
+			this.position.x,
+			this.position.y + this.radius + 60
 		);
 
 		context.fillText(
@@ -139,8 +89,8 @@ export default class Node {
 				this.direction.x.toFixed(2) +
 				", " +
 				this.direction.y.toFixed(2),
-			canvasWidth - 10,
-			80
+			this.position.x,
+			this.position.y + this.radius + 80
 		);
 
 		// draw target in green
