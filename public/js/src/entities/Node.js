@@ -9,6 +9,9 @@ export default class Node {
 		// set engine
 		this.engine = engine;
 
+		// keep track of tracer positions
+		this.tracerPositions = [];
+
 		// position
 		this.position = new Vector2D(x, y);
 
@@ -26,8 +29,49 @@ export default class Node {
 		this.debug = debug;
 	}
 
+	// Repulse another node
+	repulse(node, maxDistance) {
+		var distance = Math.floor(this.position.distanceTo(node.position));
+
+		// add both radii to distance
+		distance += this.radius + node.radius;
+
+		// if distance is less than maxDistance, repel
+		if (distance < maxDistance) {
+			const direction = this.position.directionTo(node.position);
+
+			// force gets exponentially stronger as distance gets smaller (inverse square law)
+			const force = direction.multiply(1 / (distance * 0.1));
+			//console.log("Repel force: " + force.x + ", " + force.y);
+			node.acceleration = node.acceleration.add(force);
+		}
+	}
+
+	// Attract another node
+	attract(node, minDistance) {
+		var distance = Math.floor(this.position.distanceTo(node.position));
+
+		// add both radii to distance
+		distance += this.radius + node.radius;
+
+		// if distance is greater than maxDistance, attract
+		if (distance > minDistance) {
+			const direction = this.position.directionTo(node.position);
+
+			// force gets exponentially stronger as distance gets larger
+			const force = direction.multiply(distance * 0.0003);
+			//console.log("Attract force: " + force.x + ", " + force.y);
+			node.acceleration = node.acceleration.subtract(force);
+		}
+	}
+
 	// update
 	update() {
+		// apply max acceleration
+		if (this.acceleration.magnitude() > 0.2) {
+			this.acceleration = this.acceleration.normalize().multiply(0.2);
+		}
+
 		// update velocity
 		this.velocity = this.velocity.add(this.acceleration).multiply(0.98);
 
@@ -44,6 +88,14 @@ export default class Node {
 
 		// reset acceleration
 		this.acceleration = new Vector2D(0, 0);
+
+		// add current position to tracerPositions
+		this.tracerPositions.push(this.position);
+
+		// if tracerPositions is longer than 100, remove first element
+		if (this.tracerPositions.length > 100) {
+			this.tracerPositions.shift();
+		}
 	}
 
 	// draw
