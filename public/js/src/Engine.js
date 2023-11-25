@@ -12,12 +12,12 @@ const defaultOptions = {
 
 export default class Engine {
 	// constructor
-	constructor(gameLoop, options = {}) {
+	constructor(options = {}) {
 		// merge options with default options
 		this.options = Object.assign({}, defaultOptions, options);
 
 		// set the game loop
-		this.gameLoop = gameLoop;
+		this.gameLoop = null;
 
 		// check if backgroundColor is array, and if so, convert it to rgba
 		if (Array.isArray(this.options.backgroundColor)) {
@@ -82,7 +82,10 @@ export default class Engine {
 	}
 
 	// start the engine
-	start() {
+	start(gameLoop) {
+		// set the game loop
+		this.gameLoop = gameLoop;
+
 		// start the game loop
 		this.loop = this.loop.bind(this);
 		this.loop();

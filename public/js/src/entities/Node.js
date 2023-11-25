@@ -32,7 +32,7 @@ export default class Node {
 		this.velocity = this.velocity.add(this.acceleration).multiply(0.98);
 
 		// if velocity is less than 0.1, set to 0
-		if (this.velocity.magnitude() < 0.01) {
+		if (this.velocity.magnitude() < 0.001) {
 			this.velocity = new Vector2D(0, 0);
 		}
 
@@ -93,21 +93,12 @@ export default class Node {
 		);
 
 		context.fillText(
-			"Acceleration: " +
-				this.acceleration.x.toFixed(2) +
-				", " +
-				this.acceleration.y.toFixed(2),
-			this.engine.camera.getOffsetX(this.position.x),
-			this.engine.camera.getOffsetY(this.position.y + this.radius + 60)
-		);
-
-		context.fillText(
 			"Direction: " +
 				this.direction.x.toFixed(2) +
 				", " +
 				this.direction.y.toFixed(2),
 			this.engine.camera.getOffsetX(this.position.x),
-			this.engine.camera.getOffsetY(this.position.y + this.radius + 80)
+			this.engine.camera.getOffsetY(this.position.y + this.radius + 60)
 		);
 
 		// draw direction to target in green and length of 100
