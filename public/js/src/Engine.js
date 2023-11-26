@@ -6,8 +6,10 @@ const defaultOptions = {
 	canvas: "canvas",
 	width: window.innerWidth,
 	height: window.innerHeight,
-	backgroundColor: "#111",
+	backgroundColor: [20, 20, 20, 1],
+	FPSTarget: 60,
 	showFPS: true,
+	debug: false,
 };
 
 export default class Engine {
@@ -56,35 +58,70 @@ export default class Engine {
 
 	// game loop
 	loop() {
-		// clear the canvas
-		this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+		// request another frame
+		window.requestAnimationFrame(this.loop);
 
-		// set background color to slightly lighter than black
-		this.context.fillStyle = this.options.backgroundColor;
-		this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		// if enough time has elapsed, draw the next frame
+		if (this.fpsElapsed > this.fpsInterval) {
+			// Get ready for next frame by setting then=now, but also adjust for your
+			// specified fpsInterval not being a multiple of RAF's interval (16.7ms)
+			this.fpsThen = this.fpsNow - (this.fpsElapsed % this.fpsInterval);
 
-		this.gameLoop(this);
+			// update the game
+			this.update(this);
 
-		// output camera position to console
-		//console.log(this.camera.position);
+			// clear the canvas
+			this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
-		// calculate the fps and display it if showFPS is true
-		this.calculateFPS();
-		if (this.options.showFPS) {
-			this.context.fillStyle = "#fff";
-			this.context.font = "12px Arial";
-			this.context.textAlign = "left";
-			this.context.fillText("FPS: " + this.fps, 10, 20);
+			// set background color to slightly lighter than black
+			this.context.fillStyle = this.options.backgroundColor;
+			this.context.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+			this.gameLoop(this);
+
+			// output camera position to console
+			//console.log(this.camera.position);
+
+			// calculate the fps and display it if showFPS is true
+			this.calculateFPS();
+			if (this.options.showFPS) {
+				this.context.fillStyle = "#fff";
+				this.context.font = "12px Arial";
+				this.context.textAlign = "left";
+				this.context.fillText("FPS: " + this.fps, 10, 20);
+			}
+
+			if (true) {
+				// draw camera center coordinated at bottom left corner
+				this.context.fillStyle = "#fff";
+				this.context.font = "12px Arial";
+				this.context.textAlign = "left";
+				this.context.fillText(
+					"Camera: " +
+						this.camera.position.x.toFixed(2) +
+						", " +
+						this.camera.position.y.toFixed(2),
+					10,
+					this.canvas.height - 10
+				);
+			}
 		}
 
-		// draw the next frame
-		window.requestAnimationFrame(this.loop);
+		// calculate the time since last frame
+		this.fpsNow = performance.now();
+		this.fpsElapsed = this.fpsNow - this.fpsThen;
 	}
 
 	// start the engine
-	start(gameLoop) {
+	start(update, gameLoop) {
 		// set the game loop
 		this.gameLoop = gameLoop;
+		this.update = update;
+
+		// set FPS target
+		this.fpsInterval = 1000 / this.options.FPSTarget;
+		this.fpsThen = performance.now();
+		this.fpsStartTime = this.fpsThen;
 
 		// start the game loop
 		this.loop = this.loop.bind(this);
