@@ -29,23 +29,33 @@ let medianY = 0;
 
 // create 1 node every 5 seconds
 setInterval(() => {
+	if (nodes.length >= 100) {
+		return;
+	}
+
 	// get random r, g, b values
-	const r = Math.floor(Math.random() * 255);
-	const g = Math.floor(Math.random() * 255);
-	const b = Math.floor(Math.random() * 255);
+	var r = Math.floor(Math.random() * 255);
+	var g = Math.floor(Math.random() * 255);
+	var b = Math.floor(Math.random() * 255);
+
+	//r = 0;
+	g = 0;
+	//b = 0;
 
 	// random radius between 5 and 30
-	const radius = Math.random() * 25 + 5;
+	const radius = Math.random() * (10 - 1) + 1;
 
-	nodes.push(
-		new Node(engine, medianX, medianY, radius, `rgb(${r}, ${g}, ${b})`, debug)
-	);
+	// random positions
+	const x = medianX + Math.random() * 1000 - 500;
+	const y = medianY + Math.random() * 1000 - 500;
+
+	nodes.push(new Node(engine, x, y, radius, `rgb(${r}, ${g}, ${b})`, debug));
 
 	// remove nodes if there are too many
-	if (nodes.length > 200) {
-		nodes.shift();
+	if (nodes.length > 500) {
+		nodes.splice(1, 1);
 	}
-}, 1000);
+}, 50);
 
 // update canvas size on window resize
 window.addEventListener("resize", () => {
@@ -58,7 +68,7 @@ function update(engine) {
 	nodes.forEach((node1) => {
 		nodes.forEach((node2) => {
 			if (node1 !== node2) {
-				node1.repulse(node2, 500);
+				node1.repulse(node2, 1000);
 			}
 		});
 	});
@@ -108,18 +118,19 @@ function update(engine) {
 	medianY /= nodes.length;
 
 	// update camera
-	//engine.camera.update(nodes[0].position);
-	engine.camera.update(new Vector2D(medianX, medianY));
+	engine.camera.update(nodes[0].position);
+	//engine.camera.update(nodes[nodes.length - 1].position);
+	//engine.camera.update(new Vector2D(medianX, medianY));
 	//engine.camera.update(
 	//	new Vector2D(engine.canvas.width / 2, engine.canvas.height / 2)
 	//);
 
 	nodes.forEach((node) => {
-		if (Math.random() < 0.01) {
-			node.velocity = new Vector2D(
-				Math.random() * 200 - 100,
-				Math.random() * 200 - 100
-			);
+		if (Math.random() < 0.005) {
+			node.velocity = node.velocity.multiply(Math.random() * (4 - 1.1) + 1.1);
+			if (node.velocity.magnitude() > 50) {
+				node.velocity = node.velocity.normalize().multiply(50);
+			}
 		}
 	});
 }

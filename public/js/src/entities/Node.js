@@ -50,7 +50,9 @@ export default class Node {
 			const direction = this.position.directionTo(node.position);
 
 			// force gets exponentially stronger as distance gets smaller (inverse square law)
-			const force = direction.multiply(1 / (distance * 0.1));
+			const force = direction.multiply(
+				(1 / (distance * 0.1)) * (maxDistance / 100)
+			);
 			//console.log("Repel force: " + force.x + ", " + force.y);
 			node.acceleration = node.acceleration.add(force);
 		}
@@ -125,8 +127,8 @@ export default class Node {
 	draw(context) {
 		// draw tracers and pass previous position
 		this.tracerPositions.forEach((tracer, index) => {
-			if (index > 0) {
-				tracer.draw(this.tracerPositions[index - 1].position);
+			if (index > 1) {
+				tracer.draw(this.tracerPositions[index - 2].position);
 			}
 		});
 

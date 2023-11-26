@@ -91,7 +91,7 @@ export default class Engine {
 				this.context.fillText("FPS: " + this.fps, 10, 20);
 			}
 
-			if (this.options.debug) {
+			if (true) {
 				// draw camera center coordinated at bottom left corner
 				this.context.fillStyle = "#fff";
 				this.context.font = "12px Arial";
